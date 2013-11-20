@@ -55,6 +55,7 @@ import org.apache.http.cookie.CookieSpecRegistry;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.CoreProtocolPNames;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.restlet.Client;
@@ -130,6 +131,12 @@ import org.restlet.ext.ssl.internal.SslUtils;
  * <td>int</td>
  * <td>System property "http.proxyPort" or "3128"</td>
  * <td>The port of the HTTP proxy.</td>
+ * </tr>
+ * <tr>
+ * <td>userAgent</td>
+ * <td>String</td>
+ * <td>None</td>
+ * <td>The user agent string to set in HTTP headers</td>
  * </tr>
  * <tr>
  * <td>stopIdleTimeout</td>
@@ -251,6 +258,11 @@ public class HttpClientHelper extends
         if (httpProxyHost != null) {
             HttpHost proxy = new HttpHost(httpProxyHost, getProxyPort());
             params.setParameter(ConnRoutePNames.DEFAULT_PROXY, proxy);
+        }
+
+        String userAgent = getUserAgent();
+        if (userAgent != null) {
+            params.setParameter(CoreProtocolPNames.USER_AGENT, userAgent);
         }
     }
 
@@ -398,6 +410,15 @@ public class HttpClientHelper extends
     public int getProxyPort() {
         return Integer.parseInt(getHelpedParameters().getFirstValue(
                 "proxyPort", System.getProperty("http.proxyPort", "3128")));
+    }
+
+    /**
+     * Returns the user agent string, null if it hasn't been set.
+     *
+     * @return The user agent string or <code>null</code>
+     */
+    public String getUserAgent() {
+        return getHelpedParameters().getFirstValue("userAgent", null);
     }
 
     /**
